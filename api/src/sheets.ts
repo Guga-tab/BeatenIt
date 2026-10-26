@@ -8,96 +8,93 @@ const auth = new google.auth.GoogleAuth({
 
 const sheets = google.sheets({ version: 'v4', auth });
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID as string;
-const ABA = process.env.SHEET_NAME ?? 'Jogos';
+const SHEET_NAME = process.env.SHEET_NAME ?? 'Games';
 
-// O "id" de cada jogo é o número da linha na planilha (linha 1 = cabeçalho).
-export type Jogo = { id: number; [campo: string]: string | number };
-export type DadosJogo = Record<string, string | number>;
+export type Game = { id: number; [field: string]: string | number };
+export type GameData = Record<string, string | number>;
 
-const aba = `'${ABA}'`;
+const sheetRef = `'${SHEET_NAME}'`;
 
-async function lerCabecalhos(): Promise<string[]> {
+async function readHeaders(): Promise<string[]> {
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: `${aba}!1:1`,
+    range: `${sheetRef}!1:1`,
   });
   return (res.data.values?.[0] ?? []).map(String);
 }
 
-function linhaParaJogo(cabecalhos: string[], linha: unknown[], id: number): Jogo {
-  const jogo: Jogo = { id };
-  cabecalhos.forEach((h, i) => {
-    jogo[h] = (linha[i] as string | undefined) ?? '';
+function rowToGame(headers: string[], row: unknown[], id: number): Game {
+  const game: Game = { id };
+  headers.forEach((header, i) => {
+    game[header] = (row[i] as string | undefined) ?? '';
   });
-  return jogo;
+  return game;
 }
 
-function jogoParaLinha(cabecalhos: string[], dados: DadosJogo): (string | number)[] {
-  return cabecalhos.map((h) => dados[h] ?? '');
+function gameToRow(headers: string[], data: GameData): (string | number)[] {
+  return headers.map((header) => data[header] ?? '');
 }
 
-export async function listar(): Promise<Jogo[]> {
+export async function list(): Promise<Game[]> {
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: aba,
+    range: sheetRef,
   });
-  const [cabecalhos = [], ...linhas] = res.data.values ?? [];
-  return linhas
-    .map((linha, i) => linhaParaJogo(cabecalhos.map(String), linha, i + 2))
-    .filter((j) => Object.entries(j).some(([k, v]) => k !== 'id' && v !== ''));
+  const [headers = [], ...rows] = res.data.values ?? [];
+  return rows
+    .map((row, i) => rowToGame(headers.map(String), row, i + 2))
+    .filter((g) => Object.entries(g).some(([key, value]) => key !== 'id' && value !== ''));
 }
 
-export async function buscar(id: number): Promise<Jogo | null> {
-  const cabecalhos = await lerCabecalhos();
+export async function getById(id: number): Promise<Game | null> {
+  const headers = await readHeaders();
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: `${aba}!${id}:${id}`,
+    range: `${sheetRef}!${id}:${id}`,
   });
-  const linha = res.data.values?.[0];
-  return linha ? linhaParaJogo(cabecalhos, linha, id) : null;
+  const row = res.data.values?.[0];
+  return row ? rowToGame(headers, row, id) : null;
 }
 
-export async function criar(dados: DadosJogo): Promise<Jogo> {
-  const cabecalhos = await lerCabecalhos();
+export async function create(data: GameData): Promise<Game> {
+  const headers = await readHeaders();
   const res = await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
-    range: aba,
+    range: sheetRef,
     valueInputOption: 'USER_ENTERED',
     insertDataOption: 'INSERT_ROWS',
-    requestBody: { values: [jogoParaLinha(cabecalhos, dados)] },
+    requestBody: { values: [gameToRow(headers, data)] },
   });
-  // updatedRange vem como "Jogos!A12:E12" -> pegamos o 12
   const id = Number(res.data.updates?.updatedRange?.match(/!\D+(\d+)/)?.[1]);
-  return { id, ...dados };
+  return { id, ...data };
 }
 
-export async function atualizar(id: number, dados: DadosJogo): Promise<Jogo | null> {
-  const atual = await buscar(id);
-  if (!atual) return null;
+export async function update(id: number, data: GameData): Promise<Game | null> {
+  const current = await getById(id);
+  if (!current) return null;
 
-  const cabecalhos = await lerCabecalhos();
-  const { id: _ignorado, ...resto } = atual;
-  const novo = { ...resto, ...dados };
+  const headers = await readHeaders();
+  const { id: _ignored, ...rest } = current;
+  const merged = { ...rest, ...data };
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
-    range: `${aba}!A${id}`,
+    range: `${sheetRef}!A${id}`,
     valueInputOption: 'USER_ENTERED',
-    requestBody: { values: [jogoParaLinha(cabecalhos, novo)] },
+    requestBody: { values: [gameToRow(headers, merged)] },
   });
-  return { id, ...novo };
+  return { id, ...merged };
 }
 
-export async function remover(id: number): Promise<boolean> {
-  if (!(await buscar(id))) return false;
+export async function remove(id: number): Promise<boolean> {
+  if (!(await getById(id))) return false;
 
-  // Para apagar a linha precisamos do sheetId numérico da aba
   const meta = await sheets.spreadsheets.get({
     spreadsheetId: SPREADSHEET_ID,
     fields: 'sheets.properties(sheetId,title)',
   });
-  const sheetId = meta.data.sheets?.find((s) => s.properties?.title === ABA)?.properties?.sheetId;
-  if (sheetId === undefined || sheetId === null) throw new Error(`Aba "${ABA}" não encontrada`);
+  const sheetId = meta.data.sheets?.find((s) => s.properties?.title === SHEET_NAME)?.properties?.sheetId;
+  if (sheetId === undefined || sheetId === null) throw new Error(`Sheet tab "${SHEET_NAME}" not found`);
 
   await sheets.spreadsheets.batchUpdate({
     spreadsheetId: SPREADSHEET_ID,
