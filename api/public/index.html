@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#120d2b">
+  <title>BeatenIt</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --night: #120d2b;
+      --panel: #1c1442;
+      --line: #3b2f7a;
+      --magenta: #ff3d9a;
+      --cyan: #3de8ff;
+      --gold: #ffd23f;
+      --text: #efeaff;
+      --muted: #9b92cc;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      min-height: 100vh;
+      min-height: 100dvh;
+      color: var(--text);
+      padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      font: 600 18px/1.4 'Rajdhani', system-ui, sans-serif;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .025) 0 1px, transparent 1px 4px),
+        radial-gradient(ellipse at 15% 0%, #2c1766 0, transparent 50%),
+        var(--night);
+    }
+
+    header {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    h1 {
+      margin: 0;
+      font: clamp(18px, 6vw, 26px)/1.3 'Press Start 2P', monospace;
+      color: var(--cyan);
+      text-shadow: 3px 3px 0 var(--magenta);
+    }
+
+    .score {
+      font: 14px 'Press Start 2P', monospace;
+      color: var(--gold);
+      background: var(--panel);
+      border: 3px solid var(--line);
+      padding: 12px 14px;
+      box-shadow: 4px 4px 0 #000;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 860px) {
+      main {
+        grid-template-columns: 1fr;
+        padding: 16px;
+      }
+
+      header {
+        padding: 24px 16px 4px;
+      }
+    }
+
+    .panel {
+      min-width: 0;
+      background: var(--panel);
+      border: 3px solid var(--line);
+      box-shadow: 6px 6px 0 #000;
+      padding: 18px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font: 12px/1.5 'Press Start 2P', monospace;
+      color: var(--gold);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--muted);
+    }
+
+    input {
+      display: block;
+      width: 100%;
+      margin-top: 4px;
+      padding: 12px;
+      min-height: 46px;
+      font: inherit;
+      font-size: 16px;
+      color: var(--text);
+      background: var(--night);
+      border: 2px solid var(--line);
+      border-radius: 0;
+      color-scheme: dark;
+    }
+
+    input:focus-visible,
+    button:focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 2px;
+    }
+
+    button {
+      font: 10px/1.6 'Press Start 2P', monospace;
+      cursor: pointer;
+      min-height: 44px;
+      padding: 12px 14px;
+      border: 3px solid #000;
+      color: #000;
+      background: var(--cyan);
+      box-shadow: 3px 3px 0 #000;
+    }
+
+    button:active {
+      transform: translate(3px, 3px);
+      box-shadow: none;
+    }
+
+    .primary {
+      background: var(--magenta);
+      color: #fff;
+      width: 100%;
+    }
+
+    .ghost {
+      background: var(--line);
+      color: var(--text);
+    }
+
+    .danger {
+      background: #ff5b5b;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .row button {
+      flex: 1;
+    }
+
+    .tablewrap {
+      overflow: visible;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+    }
+
+    th {
+      text-align: left;
+      font: 9px/1.6 'Press Start 2P', monospace;
+      color: var(--cyan);
+      padding: 8px;
+      border-bottom: 3px solid var(--line);
+    }
+
+    td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--line);
+      overflow-wrap: anywhere;
+    }
+
+    td:first-child {
+      color: var(--gold);
+    }
+
+    td.actions {
+      text-align: right;
+    }
+
+    td.actions button {
+      font-size: 8px;
+      min-height: 36px;
+      padding: 8px 10px;
+      margin: 3px 0 3px 6px;
+    }
+
+    #search {
+      margin-bottom: 14px;
+    }
+
+    .empty {
+      color: var(--muted);
+      padding: 24px 8px;
+    }
+
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(24px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      padding: 12px 16px;
+      background: var(--gold);
+      color: #000;
+      border: 3px solid #000;
+      box-shadow: 4px 4px 0 #000;
+      font: 10px/1.6 'Press Start 2P', monospace;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+      max-width: 90vw;
+    }
+
+    #toast.show {
+      opacity: 1;
+    }
+
+    #toast.error {
+      background: #ff5b5b;
+    }
+
+    /* Phones: the table becomes one card per game */
+    @media (max-width: 640px) {
+      .panel {
+        padding: 14px;
+        box-shadow: 4px 4px 0 #000;
+      }
+
+      .tablewrap {
+        overflow: visible;
+      }
+
+      table,
+      thead,
+      tbody,
+      tr,
+      td {
+        display: block;
+        min-width: 0;
+        width: 100%;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        background: var(--night);
+        border: 3px solid var(--line);
+        box-shadow: 3px 3px 0 #000;
+        padding: 10px 12px;
+        margin-bottom: 14px;
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        border: 0;
+        padding: 4px 0;
+        text-align: right;
+        overflow-wrap: anywhere;
+      }
+
+      td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        text-align: left;
+        flex-shrink: 0;
+      }
+
+      td:first-child {
+        display: block;
+        text-align: left;
+        font-size: 22px;
+        line-height: 1.2;
+        padding-bottom: 6px;
+      }
+
+      td:first-child::before {
+        content: none;
+      }
+
+      td.actions {
+        gap: 8px;
+        padding-top: 10px;
+      }
+
+      td.actions::before {
+        content: none;
+      }
+
+      td.actions button {
+        flex: 1;
+        margin: 0;
+        min-height: 44px;
+        font-size: 9px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .score {
+        font-size: 11px;
+        padding: 10px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>BeatenIt</h1>
+    <div class="score" id="score">0 games beaten</div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2 id="formTitle">Add a game</h2>
+      <form id="form" autocomplete="off">
+        <div id="fields"></div>
+        <button type="submit" class="primary" id="submitBtn">Save game</button>
+        <div class="row"><button type="button" class="ghost" id="cancelBtn" hidden>Cancel edit</button></div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Your games</h2>
+      <input id="search" type="search" placeholder="Search by any field">
+      <div class="tablewrap">
+        <table>
+          <thead id="thead"></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="empty" hidden>No games yet. Add your first one on the left.</div>
+    </section>
+  </main>
+  <div id="toast" role="status"></div>
+
+  <script>
+    // Keys must match the header names in row 1 of your sheet.
+    // If the sheet already has games, the columns are detected automatically
+    // and this list only sets labels and input types.
+    const FIELDS = [
+      { key: 'Name', label: 'Game', type: 'text', required: true },
+      { key: 'Platform', label: 'Platform', type: 'text' },
+      { key: 'Date', label: 'Date beaten', type: 'date' },
+      { key: 'Rating', label: 'Rating (0-10)', type: 'number', min: 0, max: 10, step: 0.5 },
+    ];
+
+    const $ = (s) => document.querySelector(s);
+    let games = [], fields = FIELDS, editingId = null;
+
+    function el(tag, text, cls) {
+      const e = document.createElement(tag);
+      if (text !== undefined) e.textContent = text;
+      if (cls) e.className = cls;
+      return e;
+    }
+
+    async function api(path, opts) {
+      const res = await fetch('/api/games' + path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || res.statusText);
+      }
+      return res.status === 204 ? null : res.json();
+    }
+
+    let toastTimer;
+    function toast(msg, isError) {
+      const t = $('#toast');
+      t.textContent = msg;
+      t.className = 'show' + (isError ? ' error' : '');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => (t.className = ''), 2800);
+    }
+
+    // Sheets may return dates as dd/mm/yyyy; date inputs need yyyy-mm-dd
+    function toInputDate(v) {
+      const m = String(v).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : v;
+    }
+
+    function renderForm() {
+      const box = $('#fields');
+      box.replaceChildren();
+      fields.forEach((f) => {
+        const label = el('label', f.label);
+        const input = document.createElement('input');
+        input.name = f.key;
+        input.type = f.type || 'text';
+        ['min', 'max', 'step'].forEach((a) => { if (f[a] !== undefined) input[a] = f[a]; });
+        if (f.required) input.required = true;
+        label.append(input);
+        box.append(label);
+      });
+    }
+
+    function renderList() {
+      const q = $('#search').value.toLowerCase();
+      const rows = games
+        .filter((g) => Object.values(g).some((v) => String(v).toLowerCase().includes(q)))
+        .reverse(); // newest first
+
+      const thead = $('#thead'), tbody = $('#tbody');
+      thead.replaceChildren();
+      tbody.replaceChildren();
+      $('#empty').hidden = rows.length > 0;
+      $('#score').textContent = `${games.length} game${games.length === 1 ? '' : 's'} beaten`;
+      if (!rows.length) return;
+
+      const head = el('tr');
+      fields.forEach((f) => head.append(el('th', f.label)));
+      head.append(el('th', ''));
+      thead.append(head);
+
+      rows.forEach((g) => {
+        const tr = el('tr');
+        fields.forEach((f) => {
+          const td = el('td', g[f.key] ?? '');
+          td.dataset.label = f.label;
+          tr.append(td);
+        });
+        const actions = el('td', undefined, 'actions');
+        const edit = el('button', 'Edit');
+        edit.onclick = () => startEdit(g);
+        const del = el('button', 'Delete', 'danger');
+        del.onclick = () => remove(g);
+        actions.append(edit, del);
+        tr.append(actions);
+        tbody.append(tr);
+      });
+    }
+
+    async function load() {
+      try {
+        games = await api('');
+        if (games.length) {
+          const detected = Object.keys(games[0])
+            .filter((k) => k !== 'id')
+            .map((k) => FIELDS.find((f) => f.key === k) || { key: k, label: k, type: 'text' });
+          if (JSON.stringify(detected) !== JSON.stringify(fields)) {
+            fields = detected;
+            renderForm();
+          }
+        }
+        renderList();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    function resetForm() {
+      editingId = null;
+      $('#form').reset();
+      $('#formTitle').textContent = 'Add a game';
+      $('#submitBtn').textContent = 'Save game';
+      $('#cancelBtn').hidden = true;
+    }
+
+    function startEdit(g) {
+      editingId = g.id;
+      const form = $('#form');
+      fields.forEach((f) => {
+        form.elements[f.key].value = f.type === 'date' ? toInputDate(g[f.key]) : g[f.key];
+      });
+      $('#formTitle').textContent = 'Edit game';
+      $('#submitBtn').textContent = 'Update game';
+      $('#cancelBtn').hidden = false;
+      form.closest('.panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      form.elements[fields[0].key].focus({ preventScroll: true });
+    }
+
+    async function remove(g) {
+      const name = g[fields[0].key] || 'this game';
+      if (!confirm(`Delete "${name}" from the sheet?`)) return;
+      try {
+        await api('/' + g.id, { method: 'DELETE' });
+        toast('Game deleted');
+        if (editingId) resetForm(); // row numbers shift after a delete
+        await load();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    $('#form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      try {
+        if (editingId) {
+          await api('/' + editingId, { method: 'PUT', body: JSON.stringify(data) });
+          toast('Game updated');
+        } else {
+          await api('', { method: 'POST', body: JSON.stringify(data) });
+          toast('Game saved to the sheet');
+        }
+        resetForm();
+        await load();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    });
+
+    $('#cancelBtn').onclick = resetForm;
+    $('#search').addEventListener('input', renderList);
+
+    renderForm();
+    load();
+  </script>
+</body>
+
+</html>
