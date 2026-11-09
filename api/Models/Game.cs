@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace GameCatalogApi.Models;
+namespace Games.Models;
 
 public enum GameStatus
 {

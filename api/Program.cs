@@ -1,8 +1,10 @@
-using GameCatalogApi.Models;
+using Games.Models;
+using Games.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<GoogleSheetsService>();
 
 var app = builder.Build();
 
@@ -55,55 +57,38 @@ var games = new List<Game>
 };
 
 
-app.MapGet("/api/games", () => 
+app.MapGet("/api/games", async (GoogleSheetsService sheetsService) => 
 {
+    var games = await sheetsService.GetGamesAsync();
     return Results.Ok(games);
 })
 .WithName("GetAllGames");
 
-app.MapGet("/api/games/{id}", (int id) => 
+app.MapGet("/api/games/{id}", async (int id, GoogleSheetsService sheetsService) => 
 {
+    var games = await sheetsService.GetGamesAsync();
     var game = games.FirstOrDefault(g => g.Id == id);
     return game is not null ? Results.Ok(game) : Results.NotFound("Jogo não encontrado.");
 })
 .WithName("GetGameById");
 
-app.MapPost("/api/games", (Game newGame) => 
+app.MapPost("/api/games", async (Game newGame, GoogleSheetsService sheetsService) => 
 {
-    newGame.Id = games.Count > 0 ? games.Max(g => g.Id) + 1 : 1;
-    games.Add(newGame);
-    
-    return Results.Created($"/api/games/{newGame.Id}", newGame);
+    await sheetsService.AddGameAsync(newGame);
+    return Results.Created($"/api/games", newGame);
 })
 .WithName("CreateGame");
 
-app.MapPut("/api/games/{id}", (int id, Game updatedGame) => 
+app.MapPut("/api/games/{id}", async (int id, Game updatedGame, GoogleSheetsService sheetsService) => 
 {
-    var game = games.FirstOrDefault(g => g.Id == id);
-    if (game is null) return Results.NotFound("Jogo não encontrado.");
-
-    game.Title = updatedGame.Title;
-    game.ReleaseYear = updatedGame.ReleaseYear;
-    game.Platform = updatedGame.Platform;
-    game.PlayedOn = updatedGame.PlayedOn;
-    game.Ownership = updatedGame.Ownership;
-    game.StartedOn = updatedGame.StartedOn;
-    game.FinishedOn = updatedGame.FinishedOn;
-    game.Rating = updatedGame.Rating;
-    game.TotalPlayed = updatedGame.TotalPlayed;
-    game.Mastered = updatedGame.Mastered;
-    game.Status = updatedGame.Status;
-
+    await sheetsService.UpdateGameAsync(id, updatedGame);
     return Results.NoContent();
 })
 .WithName("UpdateGame");
 
-app.MapDelete("/api/games/{id}", (int id) => 
+app.MapDelete("/api/games/{id}", async (int id, GoogleSheetsService sheetsService) => 
 {
-    var game = games.FirstOrDefault(g => g.Id == id);
-    if (game is null) return Results.NotFound("Jogo não encontrado.");
-
-    games.Remove(game);
+    await sheetsService.DeleteGameAsync(id);
     return Results.NoContent();
 })
 .WithName("DeleteGame");

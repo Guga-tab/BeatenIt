@@ -1,11 +1,11 @@
-# 🎮 Mylib
+# 🎮 BeatenIt
 
 Uma aplicação web desenvolvida para centralizar, gerenciar e organizar o catálogo de jogos espalhados por diferentes plataformas (Steam, Epic Games, PlayStation, Xbox, ROMs, etc.), eliminando a dúvida sobre a posse e status de cada jogo.
 
 ## 🚀 Arquitetura e Tecnologias
 
 - **Front-end:** React / HTML5, CSS3, JavaScript (ES6+), Typescript
-- **Backend / Database:** C# .NET Google Sheets API / Google spredsheets
+- **Backend / Database:** C# .NET Minimal API CRUD / Google spredsheets
 - **Protocolo de Comunicação:** REST API / JSON
 
 ## ✨ Funcionalidades
