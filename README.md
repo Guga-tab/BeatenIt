@@ -4,8 +4,8 @@ Uma aplicação web desenvolvida para centralizar, gerenciar e organizar o catá
 
 ## 🚀 Arquitetura e Tecnologias
 
-- **Front-end:** React / HTML5, CSS3, JavaScript (ES6+)
-- **Backend / Database:** Google Sheets API via Google Apps Script (Arquitetura *Spreadsheet-as-a-Service*)
+- **Front-end:** React / HTML5, CSS3, JavaScript (ES6+), Typescript
+- **Backend / Database:** C# .NET Google Sheets API / Google spredsheets
 - **Protocolo de Comunicação:** REST API / JSON
 
 ## ✨ Funcionalidades
@@ -14,7 +14,3 @@ Uma aplicação web desenvolvida para centralizar, gerenciar e organizar o catá
 - 🎯 **Status de Conclusão:** Acompanhamento do progresso (*Completed*, *Shelved*, *Mastered*, etc.).
 - ⏱️ **Métricas de Jogo:** Registro de tempo jogado, datas de início e término, e avaliação pessoal (Rating).
 - 🕹️ **Filtro por Plataforma e Mídia:** Identificação rápida da loja de origem (Steam, Epic, PS2) e do tipo de posse (Owned, ROM, Borrowed).
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT.
