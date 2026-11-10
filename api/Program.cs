@@ -6,12 +6,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<GoogleSheetsService>();
 
-// 1. Configurar Política de CORS para liberar o React (Vite)
+// Configurar Política de CORS para liberar o Front-end na Vercel
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173") // Porta padrão do React/Vite
+        policy.WithOrigins("http://localhost:5173", "https://beaten-it.vercel.app") // Substitua pelo domínio exato da sua Vercel se for diferente
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
