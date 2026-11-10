@@ -12,21 +12,40 @@ public class GoogleSheetsService
     private readonly string _spreadsheetId;
 
     public GoogleSheetsService(IConfiguration configuration)
+{
+    // Lê o ID da planilha do configuration (suporta GoogleSheets:SpreadsheetId)
+    _spreadsheetId = configuration["GoogleSheets:SpreadsheetId"] 
+        ?? Environment.GetEnvironmentVariable("GOOGLE_SPREADSHEET_ID") 
+        ?? "YOUR_SHEET_ID";
+
+    GoogleCredential credential;
+    
+    // Lê o JSON da credencial buscando pela configuração ou variável de ambiente correspondente
+    var jsonContent = configuration["GoogleSheets:CredentialsJson"] 
+        ?? Environment.GetEnvironmentVariable("GOOGLE_CREDENTIALS_JSON");
+
+    if (!string.IsNullOrEmpty(jsonContent))
     {
-        _spreadsheetId = configuration["GoogleSheets:SpreadsheetId"] ?? "YOUR_SHEET_ID";
-
-        GoogleCredential credential;
-        using (var stream = new FileStream("credentials.json", FileMode.Open, FileAccess.Read))
-        {
-            credential = GoogleCredential.FromFile("credentials.json");
-        }
-
-        _sheetsService = new SheetsService(new BaseClientService.Initializer()
-        {
-            HttpClientInitializer = credential,
-            ApplicationName = "BeatenIt",
-        });
+        credential = GoogleCredential.FromJson(jsonContent)
+            .CreateScoped(SheetsService.Scope.Spreadsheets);
     }
+    else if (File.Exists("credentials.json"))
+    {
+        using var stream = new FileStream("credentials.json", FileMode.Open, FileAccess.Read);
+        credential = GoogleCredential.FromStream(stream)
+            .CreateScoped(SheetsService.Scope.Spreadsheets);
+    }
+    else
+    {
+        throw new FileNotFoundException("Credenciais do Google não encontradas.");
+    }
+
+    _sheetsService = new SheetsService(new BaseClientService.Initializer()
+    {
+        HttpClientInitializer = credential,
+        ApplicationName = "BeatenIt",
+    });
+}
 
     public async Task<List<Game>> GetGamesAsync()
     {
