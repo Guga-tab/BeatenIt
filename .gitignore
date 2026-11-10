@@ -1,1 +1,22 @@
+# Build results
+[Dd]ebug/
+[Rr]elease/
+obj/
+bin/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+
+# User-specific files & Credenciais sensíveis
+credentials.json
 .env
+
+# O.S.
+.DS_Store
+Thumbs.db
+
+# Config devs .NET
+appsettings.Development.json
+appsettings.Local.json
