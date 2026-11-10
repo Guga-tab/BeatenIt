@@ -1,0 +1,11 @@
+.git
+.gitignore
+.vs
+.vscode
+bin/
+obj/
+appsettings.Development.json
+appsettings.Local.json
+credentials.json
+.env
+.env.local
