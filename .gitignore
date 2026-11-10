@@ -1,22 +1,200 @@
+
+############################################
+# .NET 10 / C#
+############################################
+
 # Build results
 [Dd]ebug/
 [Rr]elease/
+x64/
+x86/
+[Aa]rm/
+[Aa]rm64/
 obj/
 bin/
+[Bb]uild/
+[Bb]uild[Ll]ogs/
 
-# Visual Studio files
+# Visual Studio
 .vs/
 *.user
 *.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
 
-# User-specific files & Credenciais sensíveis
-credentials.json
+# Visual Studio Code
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# .NET generated files
+project.lock.json
+project.fragment.lock.json
+artifacts/
+TestResults/
+*.coverage
+*.coveragexml
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+
+# ASP.NET generated files
+wwwroot/lib/
+
+############################################
+# NODE.JS / NPM / YARN / PNPM
+############################################
+
+node_modules/
+.npm/
+.pnp/
+.pnp.js
+
+# Package manager logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Package manager cache
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+############################################
+# REACT / TYPESCRIPT
+############################################
+
+# Build outputs
+dist/
+build/
+out/
+coverage/
+
+# Framework builds
+.next/
+.nuxt/
+.output/
+.cache/
+
+# TypeScript
+*.tsbuildinfo
+
+# Bundlers and tooling
+.parcel-cache/
+.turbo/
+.eslintcache
+.stylelintcache
+
+############################################
+# REACT NATIVE / EXPO
+############################################
+
+.expo/
+.expo-shared/
+web-build/
+
+# Metro
+.metro-health-check*
+*.jsbundle
+
+############################################
+# ANDROID
+############################################
+
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/.cxx/
+android/.externalNativeBuild/
+
+############################################
+# IOS
+############################################
+
+ios/build/
+ios/Pods/
+ios/DerivedData/
+ios/*.xcworkspace/xcuserdata/
+ios/*.xcodeproj/xcuserdata/
+ios/*.xcuserstate
+
+# iOS generated files
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+############################################
+# ENVIRONMENT / SECRETS
+############################################
+
 .env
+.env.*
+!.env.example
+!.env.sample
 
-# O.S.
-.DS_Store
-Thumbs.db
+# Credentials
+credentials.json
+credentials.*.json
+secrets.json
+secrets.*.json
 
-# Config devs .NET
+# Certificates and keys
+*.pem
+*.key
+*.p12
+*.mobileprovision
+*.keystore
+
+# .NET environment-specific settings
 appsettings.Development.json
 appsettings.Local.json
+
+############################################
+# LOGS
+############################################
+
+logs/
+*.log
+
+############################################
+# OPERATING SYSTEM
+############################################
+
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+Desktop.ini
+
+############################################
+# TEMPORARY FILES
+############################################
+
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*.swo
+
+############################################
+# TESTING
+############################################
+
+.nyc_output/
+playwright-report/
+test-results/
+coverage/

@@ -6,56 +6,24 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<GoogleSheetsService>();
 
+// 1. Configurar Política de CORS para liberar o React (Vite)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // Porta padrão do React/Vite
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
-app.UseHttpsRedirection();
+// Remova ou comente app.UseHttpsRedirection() se estiver testando puramente via HTTP em localhost
+// app.UseHttpsRedirection();
 
-var games = new List<Game>
-{
-    new Game 
-    { 
-        Id = 1, 
-        Title = "Alice: Madness Returns", 
-        ReleaseYear = 2011, 
-        Platform = "Windows", 
-        PlayedOn = "Steam", 
-        Ownership = GameOwnership.Owned, 
-        FinishedOn = new DateOnly(2025, 5, 24), 
-        Rating = 3.0m,
-        TotalPlayed = new TimeSpan(20, 2, 0), 
-        Mastered = false, 
-        Status = GameStatus.Completed 
-    },
-    new Game 
-    { 
-        Id = 2, 
-        Title = "Batman: Arkham Asylum", 
-        ReleaseYear = 2009, 
-        Platform = "Windows", 
-        PlayedOn = "Steam", 
-        Ownership = GameOwnership.Owned, 
-        FinishedOn = new DateOnly(2023, 1, 25), 
-        Rating = 5.0m, 
-        TotalPlayed = new TimeSpan(27, 50, 0), 
-        Mastered = true, 
-        Status = GameStatus.Completed 
-    },
-    new Game 
-    { 
-        Id = 3, 
-        Title = "Dark Souls: Remastered", 
-        ReleaseYear = 2018, 
-        Platform = "Windows", 
-        PlayedOn = "Windows", 
-        Ownership = GameOwnership.Borrowed, 
-        StartedOn = new DateOnly(2026, 10, 31),
-        Rating = null,
-        TotalPlayed = null, 
-        Mastered = false, 
-        Status = GameStatus.Playing 
-    }
-};
-
+// 2. Ativar o middleware do CORS (TEM que vir antes dos MapGet/MapPost)
+app.UseCors("AllowReactApp");
 
 app.MapGet("/api/games", async (GoogleSheetsService sheetsService) => 
 {
