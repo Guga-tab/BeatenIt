@@ -154,7 +154,7 @@ function App() {
   if (error) return <div style={{ padding: '20px', color: 'red', textAlign: 'center' }}>{error}</div>;
 
   return (
-    <div style={{ padding: '30px', fontFamily: 'Arial, sans-serif', maxWidth: '1400px', margin: '0 auto', color: '#fff' }}>
+    <div className="app-container" style={{ fontFamily: 'Arial, sans-serif' }}>
       <h1 style={{ textAlign: 'center' }}>🎮 Meu Catálogo de Jogos</h1>
       <p style={{ textAlign: 'center' }}>Total de jogos cadastrados: <strong>{games.length}</strong></p>
 
@@ -165,7 +165,7 @@ function App() {
         ))}
       </datalist>
 
-      <form onSubmit={handleSubmit} style={{ background: '#1e1e1e', padding: '20px', borderRadius: '8px', marginBottom: '30px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', border: editingId ? '2px solid #ff9800' : '1px solid #333' }}>
+      <form className="game-form" onSubmit={handleSubmit} style={{ background: '#1e1e1e', padding: '20px', borderRadius: '8px', marginBottom: '30px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', border: editingId ? '2px solid #ff9800' : '1px solid #333' }}>
         <div style={{ gridColumn: '1 / -1' }}>
           <h3 style={{ margin: '0 0 10px 0', color: editingId ? '#ff9800' : '#4CAF50' }}>
             {editingId ? `Editando Jogo (ID: ${editingId})` : 'Adicionar Novo Jogo'}
@@ -246,46 +246,95 @@ function App() {
         </div>
       </form>
 
-      {/* Tabela de Jogos */}
-      <table style={{ width: '100%', borderCollapse: 'collapse', background: '#1e1e1e', borderRadius: '8px', overflow: 'hidden' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#333', textAlign: 'left' }}>
-            <th style={{ padding: '12px' }}>Título</th>
-            <th style={{ padding: '12px' }}>Ano</th>
-            <th style={{ padding: '12px' }}>Plataforma</th>
-            <th style={{ padding: '12px' }}>Onde Jogou</th>
-            <th style={{ padding: '12px' }}>Status</th>
-            <th style={{ padding: '12px' }}>Nota</th>
-            <th style={{ padding: '12px' }}>Início</th>
-            <th style={{ padding: '12px' }}>Fim</th>
-            <th style={{ padding: '12px' }}>Tempo</th>
-            <th style={{ padding: '12px', textAlign: 'center' }}>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {games.map(game => (
-            <tr key={game.id} style={{ borderBottom: '1px solid #333' }}>
-              <td style={{ padding: '12px' }}>{game.title}</td>
-              <td style={{ padding: '12px' }}>{game.releaseYear}</td>
-              <td style={{ padding: '12px' }}>{game.platform}</td>
-              <td style={{ padding: '12px' }}>{game.playedOn}</td>
-              <td style={{ padding: '12px' }}>{game.status}</td>
-              <td style={{ padding: '12px' }}>{game.rating ?? '-'}</td>
-              <td style={{ padding: '12px' }}>{game.startedOn ? game.startedOn.split('T')[0] : '-'}</td>
-              <td style={{ padding: '12px' }}>{game.finishedOn ? game.finishedOn.split('T')[0] : '-'}</td>
-              <td style={{ padding: '12px' }}>{game.totalPlayed || '-'}</td>
-              <td style={{ padding: '12px', textAlign: 'center' }}>
-                <button onClick={() => handleEditClick(game)} style={{ background: '#2196F3', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', marginRight: '6px' }}>
-                  ✏️ Editar
-                </button>
-                <button onClick={() => handleDelete(game.id)} style={{ background: '#f44336', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}>
-                  🗑️ Excluir
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Biblioteca de Jogos em Grid */}
+      <div className="games-grid">
+
+        {games.map(game => (
+          <div className="game-card" key={game.id}>
+
+            <div className="game-card-header">
+              <h3>{game.title}</h3>
+              <span className="game-year">
+                {game.releaseYear || 'Ano desconhecido'}
+              </span>
+            </div>
+
+            <div className="game-card-details">
+
+              <div className="game-info">
+                <span>Plataforma</span>
+                <strong>{game.platform || '-'}</strong>
+              </div>
+
+              <div className="game-info">
+                <span>Onde jogou</span>
+                <strong>{game.playedOn || '-'}</strong>
+              </div>
+
+              <div className="game-info">
+                <span>Status</span>
+                <strong>
+                  {['Completed', 'Playing', 'Shelved', 'Dropped'][game.status] ?? '-'}
+                </strong>
+              </div>
+
+              <div className="game-info">
+                <span>Nota</span>
+                <strong>{game.rating != null ? `⭐ ${game.rating}/5` : '-'}</strong>
+              </div>
+
+              <div className="game-info">
+                <span>Iniciado em</span>
+                <strong>
+                  {game.startedOn ? game.startedOn.split('T')[0] : '-'}
+                </strong>
+              </div>
+
+              <div className="game-info">
+                <span>Finalizado em</span>
+                <strong>
+                  {game.finishedOn ? game.finishedOn.split('T')[0] : '-'}
+                </strong>
+              </div>
+
+              <div className="game-info game-info-full">
+                <span>Tempo jogado</span>
+                <strong>{game.totalPlayed || '-'}</strong>
+              </div>
+
+            </div>
+
+            <div className="game-card-actions">
+
+              <button
+                className="edit-button"
+                onClick={() => handleEditClick(game)}
+              >
+                ✏️ Editar
+              </button>
+
+              <button
+                className="delete-button"
+                onClick={() => handleDelete(game.id)}
+              >
+                🗑️ Excluir
+              </button>
+
+            </div>
+
+          </div>
+        ))}
+
+        {games.length === 0 && (
+          <div className="empty-library">
+            <span>🎮</span>
+            <h3>Sua biblioteca está vazia</h3>
+            <p>Adicione seu primeiro jogo para começar!</p>
+          </div>
+        )}
+
+      </div>
+
     </div>
   );
 }
